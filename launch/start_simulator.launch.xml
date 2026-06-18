@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Path to the world file -->
+  <let name="world_file"
+       value="$(find-pkg-share athens_gazebo)/worlds/empty.sdf" />
+
+  <!-- Path to the bridge config file -->
+  <let name="bridge_config"
+       value="$(find-pkg-share athens_gazebo)/config/bridge.yaml" />
+
+  <!-- Gazebo Server: runs physics, no GUI -->
+  <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+    <arg name="gz_args" value="-r -s $(var world_file)"/>
+    <arg name="on_exit_shutdown" value="True"/>
+  </include>
+
+  <!-- Gazebo Client: the GUI window (with legacy renderer for VirtualBox) -->
+  <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+    <arg name="gz_args" value="-g --render-engine ogre"/>
+    <arg name="on_exit_shutdown" value="True"/>
+  </include>
+
+  <!-- ROS ↔ Gazebo Bridge -->
+  <node pkg="ros_gz_bridge" exec="parameter_bridge" name="ros_gz_bridge">
+    <param name="config_file" value="$(var bridge_config)" />
+  </node>
+
+</launch>
